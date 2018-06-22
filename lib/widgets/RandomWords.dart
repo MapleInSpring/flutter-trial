@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:startup_namer/models/WordTileData.dart';
 import 'package:startup_namer/widgets/SavedWords.dart';
+import 'package:startup_namer/widgets/TileWithIcon.dart';
 
 class RandomWords extends StatefulWidget {
   @override
@@ -11,8 +13,6 @@ class RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
 
   final _saved = new Set<WordPair>();
-
-  final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
@@ -53,24 +53,29 @@ class RandomWordsState extends State<RandomWords> {
   Widget _buildRow(WordPair pair) {
     final alreadySaved = _saved.contains(pair);
 
-    return new ListTile(
-      title: new Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: new Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
+    return new TileWithIcon(
+      data: getTileData(alreadySaved, pair),
     );
+  }
+
+  WordTileData getTileData(bool alreadySaved, WordPair pair) {
+    return alreadySaved
+        ? new WordTileData(
+            icon: Icons.favorite,
+            color: Colors.red,
+            onTap: () {
+              setState(() {
+                _saved.remove(pair);
+              });
+            },
+            pair: pair)
+        : new WordTileData(
+            icon: Icons.favorite_border,
+            onTap: () {
+              setState(() {
+                _saved.add(pair);
+              });
+            },
+            pair: pair);
   }
 }
